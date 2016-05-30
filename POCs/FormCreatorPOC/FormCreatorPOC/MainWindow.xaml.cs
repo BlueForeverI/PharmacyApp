@@ -28,20 +28,33 @@ namespace FormCreatorPOC
         private List<DependencyObject> _hitResultsList = new List<DependencyObject>();
         private Point _currentlyDraggedMouseOffset;
         private UIElement _currentlyDragged;
-        private List<UIElement> draggedElements;
+        private ContentControl _selectedControl = new ContentControl();
         public event PropertyChangedEventHandler PropertyChanged;
         private double dragOrigin = 0;
+        private int lastControlId = 0;
+
+        public ContentControl SelectedControl
+        {
+            get { return this._selectedControl; }
+            set
+            {
+                this._selectedControl = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("SelectedControl"));
+            }
+        }
 
         public MainWindow()
         {
             DataContext = this;
             InitializeComponent();
+            this.PropertiesBar.DataContext = SelectedControl;
+            PropertyChanged(this, new PropertyChangedEventArgs("PropertiesBar"));
             InitializeToolbox();
         }
 
         private void InitializeToolbox()
         {
-            this.draggedElements = new List<UIElement>();
+
             this.ToolboxControls = new ObservableCollection<UIElement>();
             Label lbl = new Label();
             lbl.Content = "Label";
@@ -84,20 +97,31 @@ namespace FormCreatorPOC
             {
                 UIElement draggedCopy = XamlReader.Parse(XamlWriter.Save(_currentlyDragged)) as UIElement;
                 draggedCopy.RenderTransform = null;
+                (draggedCopy as Control).Name = "Control" + this.lastControlId.ToString();
+                this.lastControlId++;
+                draggedCopy.MouseLeftButtonDown += DroppedControl_MouseDown;
                 canvas.Children.Add(draggedCopy);
                 draggedCopy.SetValue(Canvas.LeftProperty, e.GetPosition(canvas).X);
                 draggedCopy.SetValue(Canvas.TopProperty, e.GetPosition(canvas).Y);
-
             }
 
             _currentlyDragged = null;
             ReleaseMouseCapture();
         }
 
+        private void DroppedControl_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+        }
+
         private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            CaptureMouse();
             Point pt = e.GetPosition((UIElement)sender);
+            if(pt.X > 300 && pt.Y > 300)
+            {
+                return;
+            }
+
+            CaptureMouse();
             _hitResultsList.Clear();
 
             VisualTreeHelper.HitTest(this, null,
@@ -112,6 +136,18 @@ namespace FormCreatorPOC
 
                     if (parent is UIElement && (parent is Button || parent is Label))
                     {
+                        if (e.ClickCount == 2)
+                        {
+                            //this.SelectedControl = (parent as Control);
+                            
+                            this.SelectedControl.Name = (parent as Control).Name;
+                            this.SelectedControl.Content = (parent as ContentControl).Content;
+                            //PropertyChanged(this, new PropertyChangedEventArgs("_selectedControl"));
+                            PropertyChanged(this, new PropertyChangedEventArgs("PropertiesBar"));
+
+                            return;
+                        }
+
                         dragOrigin = pt.X;
                         _currentlyDragged = parent as UIElement;
 
@@ -138,6 +174,14 @@ namespace FormCreatorPOC
         {
             _hitResultsList.Add(result.VisualHit);
             return HitTestResultBehavior.Continue;
+        }
+
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var element =
+                this.canvas.Children.OfType<ContentControl>().FirstOrDefault(c => c.Name == this.SelectedControl.Name);
+            int index = canvas.Children.IndexOf(element);
+            (canvas.Children[index] as ContentControl).Content = (sender as TextBox).Text;
         }
     }
 }
