@@ -17,6 +17,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml;
+using System.Xml.Serialization;
+using FormCreatorPOC.Models;
+using Microsoft.Win32;
 
 namespace FormCreatorPOC
 {
@@ -31,7 +34,9 @@ namespace FormCreatorPOC
         private ContentControl _selectedControl = new ContentControl();
         public event PropertyChangedEventHandler PropertyChanged;
         private double dragOrigin = 0;
-        private int lastControlId = 0;
+        private double defaultWidth = 200;
+        private double defaultHeight = 25;
+        private Point relativePoint;
 
         public ContentControl SelectedControl
         {
@@ -62,6 +67,7 @@ namespace FormCreatorPOC
 
             Button btn = new Button();
             btn.Content = "Button";
+            btn.Height = defaultHeight;
             ToolboxControls.Add(btn);
 
             PropertyChanged(this, new PropertyChangedEventArgs("ToolboxControls"));
@@ -86,7 +92,7 @@ namespace FormCreatorPOC
                 b.Content = "Button";
                 ToolboxControls[1] = b;
             }
-            else if(_currentlyDragged is Label)
+            else if (_currentlyDragged is Label)
             {
                 Label l = new Label();
                 l.Content = "Label";
@@ -97,16 +103,34 @@ namespace FormCreatorPOC
             {
                 UIElement draggedCopy = XamlReader.Parse(XamlWriter.Save(_currentlyDragged)) as UIElement;
                 draggedCopy.RenderTransform = null;
-                (draggedCopy as Control).Name = "Control" + this.lastControlId.ToString();
-                this.lastControlId++;
+                (draggedCopy as Control).Name = "Control" + this.GetTimeStamp();
                 draggedCopy.MouseLeftButtonDown += DroppedControl_MouseDown;
                 canvas.Children.Add(draggedCopy);
-                draggedCopy.SetValue(Canvas.LeftProperty, e.GetPosition(canvas).X);
-                draggedCopy.SetValue(Canvas.TopProperty, e.GetPosition(canvas).Y);
+
+                if (_currentlyDragged is Button)
+                {
+                    (draggedCopy as Control).Width = defaultWidth;
+                    (draggedCopy as Control).Height = defaultHeight;
+                }
+
+                draggedCopy.SetValue(Canvas.LeftProperty, e.GetPosition(canvas).X - relativePoint.X);
+                draggedCopy.SetValue(Canvas.TopProperty, e.GetPosition(canvas).Y - relativePoint.Y);
+            }
+            else if (_currentlyDragged != null)
+            {
+                _currentlyDragged.RenderTransform = null;
+                _currentlyDragged.SetValue(Canvas.LeftProperty, e.GetPosition(canvas).X - relativePoint.X);
+                _currentlyDragged.SetValue(Canvas.TopProperty, e.GetPosition(canvas).Y - relativePoint.Y);
             }
 
             _currentlyDragged = null;
             ReleaseMouseCapture();
+        }
+
+        private string GetTimeStamp()
+        {
+            DateTime now = DateTime.UtcNow;
+            return now.Ticks.ToString();
         }
 
         private void DroppedControl_MouseDown(object sender, MouseButtonEventArgs e)
@@ -116,12 +140,11 @@ namespace FormCreatorPOC
         private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point pt = e.GetPosition((UIElement)sender);
-            if(pt.X > 300 && pt.Y > 300)
+            if (pt.X > 300 && pt.Y > 300)
             {
                 return;
             }
 
-            CaptureMouse();
             _hitResultsList.Clear();
 
             VisualTreeHelper.HitTest(this, null,
@@ -136,10 +159,12 @@ namespace FormCreatorPOC
 
                     if (parent is UIElement && (parent is Button || parent is Label))
                     {
+                        CaptureMouse();
+
                         if (e.ClickCount == 2)
                         {
                             //this.SelectedControl = (parent as Control);
-                            
+
                             this.SelectedControl.Name = (parent as Control).Name;
                             this.SelectedControl.Content = (parent as ContentControl).Content;
                             //PropertyChanged(this, new PropertyChangedEventArgs("_selectedControl"));
@@ -149,6 +174,7 @@ namespace FormCreatorPOC
                         }
 
                         dragOrigin = pt.X;
+                        this.relativePoint = e.GetPosition(parent as UIElement);
                         _currentlyDragged = parent as UIElement;
 
                         if (_currentlyDragged.RenderTransform is TranslateTransform)
@@ -182,6 +208,88 @@ namespace FormCreatorPOC
                 this.canvas.Children.OfType<ContentControl>().FirstOrDefault(c => c.Name == this.SelectedControl.Name);
             int index = canvas.Children.IndexOf(element);
             (canvas.Children[index] as ContentControl).Content = (sender as TextBox).Text;
+        }
+
+        private void menuItemFileOpen_Click(object sender, RoutedEventArgs e)
+        {
+            Template template = GetTemplate();
+            canvas.Children.Clear();
+
+            foreach (var templControl in template.Controls)
+            {
+                ContentControl control = new ContentControl();
+                if (templControl.Type == typeof(Button).Name)
+                {
+                    control = new Button();
+                }
+                else if (templControl.Type == typeof(Label).Name)
+                {
+                    control = new Label();
+                }
+
+                control.Name = templControl.Name;
+                control.Content = templControl.Title;
+                control.SetValue(LeftProperty, templControl.X);
+                control.SetValue(TopProperty, templControl.Y);
+                canvas.Children.Add(control);
+            }
+        }
+
+        private Template GetTemplate()
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "XML file (*.xml) | *.xml";
+            Template template = new Template();
+            if (dialog.ShowDialog() == true)
+            {
+                template.Name = dialog.SafeFileName;
+
+                XmlSerializer serializer = new XmlSerializer(template.GetType());
+                using (FileStream fs = new FileStream(dialog.FileName, FileMode.Open))
+                {
+                    template = serializer.Deserialize(fs) as Template;
+                }
+            }
+
+            return template;
+        }
+
+        private void menuItemFileSave_Click(object sender, RoutedEventArgs e)
+        {
+            var canvasControls = canvas.Children.OfType<ContentControl>();
+            List<TemplateControl> controls = new List<TemplateControl>();
+            foreach (var contentControl in canvasControls)
+            {
+                controls.Add(new TemplateControl()
+                                 {
+                                     Name = contentControl.Name,
+                                     Title = contentControl.Content.ToString(),
+                                     Type = contentControl.GetType().Name,
+                                     X = double.Parse(contentControl.GetValue(LeftProperty).ToString()),
+                                     Y = double.Parse(contentControl.GetValue(TopProperty).ToString())
+                                 });
+            }
+
+            Template template = new Template();
+            template.Controls = controls;
+            SaveTemplate(template);
+        }
+
+        private void SaveTemplate(Template template)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "XML file (*.xml) | *.xml";
+            if (dialog.ShowDialog() == true)
+            {
+                template.Name = dialog.SafeFileName;
+                XmlSerializer serializer = new XmlSerializer(template.GetType());
+                using (FileStream fs = new FileStream(dialog.FileName, FileMode.Create))
+                {
+                    serializer.Serialize(fs, template);
+                }
+
+                MessageBox.Show("File saved successfully");
+            }
         }
     }
 }

@@ -6,6 +6,12 @@
         PreviewMouseMove="Window_PreviewMouseMove" 
         PreviewMouseLeftButtonUp="Window_PreviewMouseLeftButtonUp">
     <StackPanel>
+        <Menu>
+            <MenuItem Header="File">
+                <MenuItem Header="Open" x:Name="menuItemFileOpen" Click="menuItemFileOpen_Click"/>
+                <MenuItem Header="Save" x:Name="menuItemFileSave" Click="menuItemFileSave_Click"/>
+            </MenuItem>
+        </Menu>
         <WrapPanel>
             <Border BorderThickness="1" BorderBrush="Black">
                 <Canvas Width="300" Height="500" x:Name="canvas" MouseLeftButtonDown="DroppedControl_MouseDown">
@@ -28,7 +34,7 @@
                         Background="DarkKhaki">
                     <WrapPanel>
                         <Label>Name</Label>
-                        <TextBox Width="100" Text="{Binding Name}" IsEnabled="False"/>
+                        <TextBox Width="200" Text="{Binding Name}" IsEnabled="False"/>
                     </WrapPanel>
                     <WrapPanel>
                         <Label>Content</Label>
