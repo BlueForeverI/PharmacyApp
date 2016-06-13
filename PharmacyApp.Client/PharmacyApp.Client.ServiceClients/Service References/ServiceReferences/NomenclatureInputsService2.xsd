@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/PharmacyApp.Server.App.Models" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/PharmacyApp.Server.App.Models" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://pharmacyappserver.apphb.com/Services/NomenclatureInputsService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/PharmacyApp.Server.Models" />
+  <xs:complexType name="ArrayOfNomenclatureInput">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="NomenclatureInput" nillable="true" type="tns:NomenclatureInput" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfNomenclatureInput" nillable="true" type="tns:ArrayOfNomenclatureInput" />
+  <xs:complexType name="NomenclatureInput">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Length" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/PharmacyApp.Server.Models" minOccurs="0" name="Type" type="q1:NomenclatureInputType" />
+      <xs:element minOccurs="0" name="ValidationRegex" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="X" type="xs:double" />
+      <xs:element minOccurs="0" name="Y" type="xs:double" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="NomenclatureInput" nillable="true" type="tns:NomenclatureInput" />
+</xs:schema>

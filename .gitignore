@@ -2,3 +2,9 @@
 /POCs/FormCreatorPOC/*.suo
 /POCs/FormCreatorPOC/FormCreatorPOC/obj
 /POCs/FormCreatorPOC/FormCreatorPOC/bin
+/PharmacyApp.Client/PharmacyApp.Client.v11.suo
+/PharmacyApp.Client/_ReSharper.PharmacyApp.Client
+/PharmacyApp.Client/PharmacyApp.Client/obj
+/PharmacyApp.Client/PharmacyApp.Client/bin
+/PharmacyApp.Client/PharmacyApp.Client.ServiceClients/obj
+/PharmacyApp.Client/PharmacyApp.Client.ServiceClients/bin

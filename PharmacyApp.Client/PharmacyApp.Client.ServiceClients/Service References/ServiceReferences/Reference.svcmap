@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="e33b761f-1854-43af-a7b5-93d307f4782c" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://pharmacyappserver.apphb.com/Services/NomenclatureInputsService.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="NomenclatureInputsService.wsdl" MetadataType="Wsdl" ID="fde85f4f-19bb-42b7-b763-a3c40b4c09c8" SourceId="1" SourceUrl="http://pharmacyappserver.apphb.com/Services/NomenclatureInputsService.svc?wsdl" />
+    <MetadataFile FileName="NomenclatureInputsService.disco" MetadataType="Disco" ID="5a9ddb11-23a3-4018-a3d3-d58f460a8ace" SourceId="1" SourceUrl="http://pharmacyappserver.apphb.com/Services/NomenclatureInputsService.svc?disco" />
+    <MetadataFile FileName="NomenclatureInputsService.xsd" MetadataType="Schema" ID="ccd0ea69-8e6c-492e-afad-283836af0a72" SourceId="1" SourceUrl="http://pharmacyappserver.apphb.com/Services/NomenclatureInputsService.svc?xsd=xsd0" />
+    <MetadataFile FileName="NomenclatureInputsService1.xsd" MetadataType="Schema" ID="24910d30-314e-4dea-a164-98c81ae99969" SourceId="1" SourceUrl="http://pharmacyappserver.apphb.com/Services/NomenclatureInputsService.svc?xsd=xsd1" />
+    <MetadataFile FileName="NomenclatureInputsService2.xsd" MetadataType="Schema" ID="0d4ca256-7220-46d1-af1b-9810d1524557" SourceId="1" SourceUrl="http://pharmacyappserver.apphb.com/Services/NomenclatureInputsService.svc?xsd=xsd2" />
+    <MetadataFile FileName="NomenclatureInputsService3.xsd" MetadataType="Schema" ID="02529cec-306b-4351-a951-ce935ef1bedf" SourceId="1" SourceUrl="http://pharmacyappserver.apphb.com/Services/NomenclatureInputsService.svc?xsd=xsd3" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>
