@@ -1,8 +1,32 @@
 ﻿<Window x:Class="PharmacyApp.Client.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Pharmacy App" Height="350" Width="525">
+        xmlns:ViewModels="clr-namespace:PharmacyApp.Client.ViewModels"
+        xmlns:Views="clr-namespace:PharmacyApp.Client.Views" 
+        Title="{Binding AppTitle}" Height="350" Width="525">
+    <Window.DataContext>
+        <ViewModels:AppViewModel />
+    </Window.DataContext>
+    <Window.Resources>
+        <DataTemplate            
+            DataType="{x:Type ViewModels:TemplateDesignerViewModel}">
+            <Views:TemplateDesignerView />
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
-        
+        <StackPanel>
+            <Menu>
+                <MenuItem Header="Услуги">
+                    <MenuItem Header="Номенклатури" Command="{Binding NomenclaturesCommand}" />
+                </MenuItem>
+                <MenuItem Header="Изход">
+                    
+                </MenuItem>
+            </Menu>
+            <ContentControl 
+                Content="{Binding Path=CurrentViewModel}" 
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch" />
+        </StackPanel>
     </Grid>
 </Window>
